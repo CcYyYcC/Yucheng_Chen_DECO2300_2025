@@ -22,7 +22,7 @@ In Week 1, I explored XR applications that support active user interactions. Bas
 This week helped clarify the difference between passive VR experiences and active XR interaction. Procreate was chosen as a strong starting point for developing an immersive and productive creative tool in extended reality.
 
 
-
+#
 # Week 2 Activity Log – XR App Concept Development
 
 ## Project Title  
