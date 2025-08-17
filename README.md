@@ -71,3 +71,47 @@ After the low-fidelity prototyping session, I conducted short interviews with tw
 
 ## Reflection  
 This week helped validate the idea of spatial separation between tool controls (right hand) and global functions (left hand). Physical prototyping using sketches and enactment allowed rapid testing of the gesture flow and control layout. The feedback indicated that users expected visual confirmation when menus were activated, and clear anchoring of radial menus relative to the hand position. These insights will inform improvements in menu placement and gesture feedback for future iterations.
+
+# Week 3 Activity Log – XR App Concept Development
+
+## Project Title  
+**XR Extension of Procreate**
+
+## Overview  
+In Week 3, the focus shifted from concept exploration to preparing and enacting the first testing phase.  
+Following the course steps, I set up the repository structure on GitHub, built the initial Unity project under *Prototype 1*, and ensured version control with `.gitignore`. During class, I completed a Testing Plan document (IP1) to guide the evaluation of core XR interactions. Work also began on constructing the first Unity prototype to support these tests.
+
+## Activities  
+- **Repository Setup**  
+  - Cloned the GitHub repository and added the required folder structure.  
+  - Verified `.gitignore` for Unity files and made the first commit.  
+
+- **Testing Plan Development (in class)**  
+  - Defined testing objectives: gesture controls for canvas, wrist menu usability, and layer management clarity.  
+  - Outlined testing methodologies: *Think-Aloud Protocol*, *Task-Based Testing*, and optional *A/B Comparison*.  
+  - Specified prototype requirements: zoom/move canvas, left and right wrist menus, floating layer panels, and clear visual feedback.  
+  - Finalized data collection methods (task completion time, success rate, qualitative feedback).  
+
+- **Unity Prototype Setup**  
+  - Created a core scene for testing spatial elements.  
+  - Planned interactive objects (canvas, menus, layer cards).  
+  - Began implementing gesture-based zoom, move, and menu activation.  
+
+## Testing Plan (Summary)  
+- **Objectives**:  
+  - Evaluate ease and accuracy of gesture controls for the canvas.  
+  - Test wrist menu usability for quick tool switching.  
+  - Check whether spatial layer management improves workflow.  
+
+- **Methodology**:  
+  - Think-Aloud during interaction.  
+  - Task-based tests (zoom, add/rearrange layers, switch tools).  
+  - Optional A/B comparison of menu layouts.  
+
+- **Success Criteria**:  
+  - 80% of users complete all tasks successfully on the first try.  
+  - Average satisfaction ≥ 4/5.  
+  - Positive user feedback on gesture/menu design.  
+
+## Reflection  
+This week transitioned the project into practical testing preparation. Setting up Git ensured proper project management, while the Testing Plan clarified what to evaluate and how to measure success. Beginning Unity prototyping made the design ideas more concrete, highlighting the need for functional gesture input and visible feedback for effective user testing in Week 4.
