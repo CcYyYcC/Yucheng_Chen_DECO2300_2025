@@ -23,8 +23,8 @@ public class FollowView : MonoBehaviour
         Quaternion viewRot = viewTarget.rotation;
         if (yawOnly) viewRot = Quaternion.Euler(0f, viewTarget.eulerAngles.y, 0f);
 
-        // 前后反：在 Y 轴上加 180°
-        viewRot *= Quaternion.Euler(0f, 180f, 0f);
+        //  
+        viewRot *= Quaternion.Euler(0f, 0f, 0f);
 
         // 修正后的前向
         Vector3 fwd = viewRot * Vector3.forward;
