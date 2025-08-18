@@ -9,18 +9,14 @@ public class Zoom : MonoBehaviour
     public Camera cam;
 
     [Header("缩放参数")]
-    [Tooltip("每个“虚拟步进”的缩放比例(0.1=10%)")]
-    public float zoomStep = 0.15f;         // 单步幅度
-    [Tooltip("长按W/S时每秒步进次数")]
-    public float stepsPerSecond = 8f;      // 速度
+    [Tooltip("每个滚轮单位对应的缩放比例(0.1≈10%)")]
+    public float zoomStep = 0.15f;          // 单步幅度（滚轮一格）
     [Tooltip("相对初始大小的最小/最大倍数")]
-    public float minScaleMultiplier = 0.1f; // 最小=初始的 0.1 倍
-    public float maxScaleMultiplier = 10f;  // 最大=初始的 10 倍
-    public bool zoomToMouse = true;        // 围绕鼠标缩放
-
-    [Header("键位")]
-    public KeyCode zoomInKey = KeyCode.W;
-    public KeyCode zoomOutKey = KeyCode.S;
+    public float minScaleMultiplier = 0.1f;  // 最小=初始的 0.1 倍
+    public float maxScaleMultiplier = 10f;   // 最大=初始的 10 倍
+    public bool zoomToMouse = true;          // 围绕鼠标缩放
+    [Tooltip("如方向相反可勾选：上滚缩小，下滚放大")]
+    public bool invertScroll = false;
 
     // 记录初始等比缩放
     private float _baseScale = 1f;
@@ -38,30 +34,32 @@ public class Zoom : MonoBehaviour
                 cam = Camera.main;
         }
 
-        // 取初始等比缩放（假设 XYZ 一致，World Space Canvas 通常是 0.01）
+        // 取初始等比缩放（World Space Canvas 常见为 0.01）
         _baseScale = targetRoot.localScale.x;
         if (_baseScale <= 0f) _baseScale = 0.01f;
     }
 
     void Update()
     {
-        float dir = 0f;
-        if (Input.GetKey(zoomInKey))  dir += 1f;  // W 放大
-        if (Input.GetKey(zoomOutKey)) dir -= 1f;  // S 缩小
-        if (Mathf.Approximately(dir, 0f)) return;
+        // 读取滚轮（优先新API，兼容旧轴）
+        float scroll = Input.mouseScrollDelta.y;
+        if (Mathf.Approximately(scroll, 0f))
+            scroll = Input.GetAxis("Mouse ScrollWheel") * 120f; // 某些设备返回旧轴
+
+        if (invertScroll) scroll = -scroll;
+        if (Mathf.Abs(scroll) < 0.001f) return;  // 无滚动就不处理
 
         // 当前大小（相对初始的倍数）
         float currentMul = targetRoot.localScale.x / _baseScale;
 
-        // 幂函数实现与帧率无关的平滑缩放
-        float factor = Mathf.Pow(1f + Mathf.Max(0.0001f, zoomStep), dir * stepsPerSecond * Time.deltaTime);
+        // 幂函数实现平滑缩放：scroll>0 放大，scroll<0 缩小
+        float factor = Mathf.Pow(1f + Mathf.Max(0.0001f, zoomStep), scroll);
         float newMul = Mathf.Clamp(currentMul * factor, minScaleMultiplier, maxScaleMultiplier);
         if (Mathf.Approximately(newMul, currentMul)) return;
 
-        float oldScale = targetRoot.localScale.x;
         float newScale = _baseScale * newMul;
 
-        // 围绕鼠标位置缩放：保持鼠标下点不漂移
+        // 围绕鼠标位置缩放：保持鼠标下的点不漂移
         Vector3 pivotWorld = GetMouseWorldOnPlane();
         Vector3 localBefore = targetRoot.InverseTransformPoint(pivotWorld);
 
