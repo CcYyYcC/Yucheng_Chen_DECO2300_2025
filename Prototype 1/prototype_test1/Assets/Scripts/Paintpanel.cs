@@ -1,71 +1,102 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// 仅负责“绘图 UI 面板”的交互逻辑：
+/// - 颜色选择、清空、橡皮切换、回到画笔、关闭面板；
+/// - 滑条统一控制笔/橡皮粗细；
+/// - “重置”按钮不再直接改 Transform，而是转发给 ResetManager（避免冲突/失效）
+/// </summary>
 public class PaintPanel : MonoBehaviour
 {
-    [Header("目标绘制脚本")]
+    [Header("目标绘制脚本（画笔逻辑）")]
     public Paint paint;
 
     [Header("颜色按钮（Image 的颜色即为画笔色）")]
     public Button[] colorButtons;
 
-    [Header("清空 / 橡皮 / 关闭")]
+    [Header("清空 / 橡皮(切换) / 笔 / 关闭 / 复位（转发）")]
     public Button clearButton;
-    public Button eraserToggleButton;
-    public Button closePaintPanel;
+    public Button eraserToggleButton;     // 橡皮 ↔ 画笔 切换
+    public Button penButton;              // 一键回到“画笔”
+    public Button closePaintPanel;        // 关闭本 UI 面板
+    public Button resetCanvasButton;      // 转发给 ResetManager 的“复位”按钮
 
     [Header("笔刷粗细滑条（建议最小1，最大128）")]
     public Slider sizeSlider;
 
+    [Header("外部复位管理器（独立存在，优先级最高）")]
+    public ResetManager resetManager;
+
+    // 仅用于 UI 同步当前“我们认为的工具状态”（如果 Paint 没暴露 IsEraser）
+    private bool assumedEraser = false;
+
     void Awake()
     {
-        if (paint == null) paint = FindObjectOfType<Paint>();
-        if (paint == null) { Debug.LogError("[PaintPanel] 未找到 Paint 组件。"); enabled = false; return; }
+        // 找不到 Paint 就禁用，避免空引用
+        if (!paint) paint = FindObjectOfType<Paint>();
+        if (!paint) { Debug.LogError("[PaintPanel] 未找到 Paint 组件。"); enabled = false; return; }
 
-        // 颜色按钮：闭包安全
+        // —— 颜色按钮：点击即把其 Image.color 设置为画笔色 —— //
         if (colorButtons != null)
         {
             foreach (var btn in colorButtons)
             {
-                if (btn == null) continue;
+                if (!btn) continue;
                 var img = btn.GetComponent<Image>();
-                var color = (img != null) ? img.color : Color.black;
-                btn.onClick.AddListener(() => paint.SetColor(color));
+                var c = img ? img.color : Color.black;
+                btn.onClick.AddListener(() => paint.SetColor(c));
             }
         }
 
-        // 清空
-        if (clearButton != null)
+        // 清空画布
+        if (clearButton)
             clearButton.onClick.AddListener(() => paint.ClearTexture());
 
-        // 橡皮开关
-        if (eraserToggleButton != null)
-            eraserToggleButton.onClick.AddListener(() => paint.ToggleEraser());
+        // 橡皮 ↔ 画笔 切换（调用 Paint 的 ToggleEraser）
+        if (eraserToggleButton)
+            eraserToggleButton.onClick.AddListener(() =>
+            {
+                paint.ToggleEraser();
+                assumedEraser = !assumedEraser;
+            });
 
-        // 关闭
-        if (closePaintPanel != null)
+        // “笔”按钮：如果当前是橡皮，则再切一次回到画笔
+        if (penButton)
+            penButton.onClick.AddListener(() =>
+            {
+                if (assumedEraser)
+                {
+                    paint.ToggleEraser();
+                    assumedEraser = false;
+                }
+            });
+
+        // 关闭本 UI 面板（注意：只是隐藏 UI，不影响 ResetManager 工作）
+        if (closePaintPanel)
             closePaintPanel.onClick.AddListener(() => gameObject.SetActive(false));
 
-        // 粗细滑条
-        if (sizeSlider != null)
+        // 粗细滑条：统一控制笔/橡皮的粗细（Paint 里要确保 SetBrushSize 同步两者）
+        if (sizeSlider)
         {
+            // 基本边界与整数步进
             if (sizeSlider.minValue <= 0f) sizeSlider.minValue = 1f;
             if (sizeSlider.maxValue < sizeSlider.minValue) sizeSlider.maxValue = 128f;
-
             sizeSlider.wholeNumbers = true;
-            sizeSlider.value = Mathf.Clamp(paint.brushRadius, (int)sizeSlider.minValue, (int)sizeSlider.maxValue);
 
+            // 初始值与回调
+            sizeSlider.value = Mathf.Clamp(paint.brushRadius, sizeSlider.minValue, sizeSlider.maxValue);
             sizeSlider.onValueChanged.AddListener(v => paint.SetBrushSize(v));
         }
+
+        // “复位”按钮转发：调用 ResetManager（不要直接在这里改 Transform，避免与 ResetManager 冲突）
+        if (resetCanvasButton)
+            resetCanvasButton.onClick.AddListener(() => resetManager?.ResetNow());
     }
 
     void OnEnable()
     {
-        // 打开面板时同步一次当前笔刷大小（运行中可能外部改过）
-        if (sizeSlider != null)
-        {
-            // 若你的 Unity 版本没有这个 API，可改用：sizeSlider.value = paint.brushRadius;
-            sizeSlider.SetValueWithoutNotify(paint.brushRadius);
-        }
+        // 打开面板时，同步一次滑条显示值（避免外部改过 brushRadius 导致显示不同步）
+        if (sizeSlider) sizeSlider.SetValueWithoutNotify(paint.brushRadius);
     }
 }
