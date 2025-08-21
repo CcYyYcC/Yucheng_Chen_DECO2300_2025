@@ -28,6 +28,11 @@ public class PaintPanel : MonoBehaviour
     [Header("外部复位管理器（独立存在，优先级最高）")]
     public ResetManager resetManager;
 
+    // —— 新增：展示用游标（笔/橡皮），不影响绘制逻辑 —— //
+    [Header("展示用：笔/橡皮模型显隐控制")]
+    public PenCursorOnBoard penCursor;      // 挂载了笔模型的实例
+    public EraserCursorOnBoard eraserCursor;   // 挂载了橡皮模型的实例
+
     // 仅用于 UI 同步当前“我们认为的工具状态”（如果 Paint 没暴露 IsEraser）
     private bool assumedEraser = false;
 
@@ -46,12 +51,19 @@ public class PaintPanel : MonoBehaviour
                 var img = btn.GetComponent<Image>();
                 var c = img ? img.color : Color.black;
                 btn.onClick.AddListener(() => paint.SetColor(c));
+                // 颜色按钮不改变游标显隐
             }
         }
 
         // 清空画布
         if (clearButton)
-            clearButton.onClick.AddListener(() => paint.ClearTexture());
+            clearButton.onClick.AddListener(() =>
+            {
+                paint.ClearTexture();
+                // 触发其他功能时：两种游标均隐藏
+                if (penCursor) penCursor.Show(false);
+                if (eraserCursor) eraserCursor.Show(false);
+            });
 
         // 橡皮 ↔ 画笔 切换（调用 Paint 的 ToggleEraser）
         if (eraserToggleButton)
@@ -59,6 +71,10 @@ public class PaintPanel : MonoBehaviour
             {
                 paint.ToggleEraser();
                 assumedEraser = !assumedEraser;
+
+                // 显示橡皮游标、隐藏笔游标
+                if (eraserCursor) eraserCursor.Show(true);
+                if (penCursor)    penCursor.Show(false);
             });
 
         // “笔”按钮：如果当前是橡皮，则再切一次回到画笔
@@ -70,11 +86,20 @@ public class PaintPanel : MonoBehaviour
                     paint.ToggleEraser();
                     assumedEraser = false;
                 }
+                // 显示笔游标、隐藏橡皮游标
+                if (penCursor)    penCursor.Show(true);
+                if (eraserCursor) eraserCursor.Show(false);
             });
 
         // 关闭本 UI 面板（注意：只是隐藏 UI，不影响 ResetManager 工作）
         if (closePaintPanel)
-            closePaintPanel.onClick.AddListener(() => gameObject.SetActive(false));
+            closePaintPanel.onClick.AddListener(() =>
+            {
+                // 关闭面板时游标也隐藏
+                if (penCursor)    penCursor.Show(false);
+                if (eraserCursor) eraserCursor.Show(false);
+                gameObject.SetActive(false);
+            });
 
         // 粗细滑条：统一控制笔/橡皮的粗细（Paint 里要确保 SetBrushSize 同步两者）
         if (sizeSlider)
@@ -91,7 +116,13 @@ public class PaintPanel : MonoBehaviour
 
         // “复位”按钮转发：调用 ResetManager（不要直接在这里改 Transform，避免与 ResetManager 冲突）
         if (resetCanvasButton)
-            resetCanvasButton.onClick.AddListener(() => resetManager?.ResetNow());
+            resetCanvasButton.onClick.AddListener(() =>
+            {
+                // 复位时游标隐藏
+                if (penCursor)    penCursor.Show(false);
+                if (eraserCursor) eraserCursor.Show(false);
+                resetManager?.ResetNow();
+            });
     }
 
     void OnEnable()
@@ -99,4 +130,7 @@ public class PaintPanel : MonoBehaviour
         // 打开面板时，同步一次滑条显示值（避免外部改过 brushRadius 导致显示不同步）
         if (sizeSlider) sizeSlider.SetValueWithoutNotify(paint.brushRadius);
     }
+
+    void OnDisable() { if (penCursor) penCursor.Show(false); if (eraserCursor) eraserCursor.Show(false); }
+    void OnDestroy() { if (penCursor) penCursor.Show(false); if (eraserCursor) eraserCursor.Show(false); }
 }
