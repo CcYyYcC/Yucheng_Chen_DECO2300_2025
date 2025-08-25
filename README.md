@@ -115,3 +115,41 @@ Following the course steps, I set up the repository structure on GitHub, built t
 
 ## Reflection  
 This week transitioned the project into practical testing preparation. Setting up Git ensured proper project management, while the Testing Plan clarified what to evaluate and how to measure success. Beginning Unity prototyping made the design ideas more concrete, highlighting the need for functional gesture input and visible feedback for effective user testing in Week 4.
+
+
+
+
+# Week 4 Studio Summary  
+Course: DECO2300/7230  
+Topic: Prototype Progress & Testing Preparation  
+
+## Testing Preparation Checklist  
+- Student ID prepared for identity verification (or temporary one from student center)  
+- Concept validated (refer to A1.1 feedback)  
+- Clear goals, aims, and assumptions defined for testing  
+- Valid methodology established for testing process  
+- Clear data collection plan (what and how data will be collected)  
+- Testing steps defined (should take ~5 minutes)  
+- Horizontal Unity prototype prepared, including environment, affordances, and interactions  
+- Git repository active for committing code and test results  
+
+If any of these steps are unclear or incomplete, discuss with the teaching team.  
+
+## Prototype Progress  
+- Current focus: preparing Unity prototype to demonstrate key environment and interaction features  
+- Ensuring workflow is test-ready with visual and functional affordances  
+- Repository setup and commits ongoing  
+
+## Tutor Discussion Notes  
+- Testing format: testing should be short (≤5 min) and focus on clarity, measuring whether gestures, menus, or interactions are intuitive and functional  
+- Unity demonstration tips:  
+  - Keep prototype interactions simple and clear  
+  - Ensure affordances are visually distinct so participants understand what can be interacted with  
+  - Visual cues and minimal feedback systems (highlight, glow, menu animation) improve clarity  
+  - A well-prepared scene with essential interactions works better than a complex unfinished setup  
+
+## Next Steps  
+- Finalise Unity environment with clear affordances and spatial interactions  
+- Add minimal but effective visual feedback to menus and gestures  
+- Define specific testing tasks (~5 min each) aligned with research aims  
+- Prepare Git commits and documentation for testing outcomes  
