@@ -1,6 +1,9 @@
 # Test Feedback – Summary of 5 Participants
 
-Here are the [Testing Plan for Interactive Prototype 1](./Testing Plan for IP1.docx) and the [TestTable for ProtoType1](./TestTable for ProtoType1.pdf). 
+Here are the [Testing Plan for Interactive Prototype 1](./Testing%20Plan%20for%20IP1.docx) and the [TestTable for ProtoType1](./TestTable%20for%20ProtoType1.pdf).
+
+Below is the test feedback.
+
 
 Below is the test feedback.
 
