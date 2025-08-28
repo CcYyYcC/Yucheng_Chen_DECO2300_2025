@@ -6406,7 +6406,6 @@ RectTransform:
   - {fileID: 1565301407}
   - {fileID: 23582737}
   - {fileID: 1190704255}
-  - {fileID: 799212761}
   m_Father: {fileID: 1357115040}
   m_LocalEulerAnglesHint: {x: 0, y: 166, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -10431,18 +10430,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 799212760}
-  m_LocalRotation: {x: -0, y: 0.03958668, z: -0, w: 0.99921614}
-  m_LocalPosition: {x: 0, y: 0, z: 272}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: 0.9965925, z: -0, w: 0.08248225}
+  m_LocalPosition: {x: 0, y: 0, z: -13.475944}
+  m_LocalScale: {x: 0.002050069, y: 0.002, z: 0.009949931}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1796006244}
   - {fileID: 1727909089}
-  m_Father: {fileID: 492359760}
+  m_Father: {fileID: 1357115040}
   m_LocalEulerAnglesHint: {x: 0, y: 4.537, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 78, y: -159}
+  m_AnchoredPosition: {x: 12.037659, y: 2.2700043}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &806828064
@@ -19240,7 +19239,6 @@ GameObject:
   - component: {fileID: 1357115040}
   - component: {fileID: 1357115041}
   - component: {fileID: 1357115042}
-  - component: {fileID: 1357115043}
   m_Layer: 0
   m_Name: BoardRig
   m_TagString: Untagged
@@ -19263,6 +19261,7 @@ Transform:
   m_Children:
   - {fileID: 492359760}
   - {fileID: 867012331}
+  - {fileID: 799212761}
   - {fileID: 893888796}
   - {fileID: 623904356}
   m_Father: {fileID: 1832204174}
@@ -19305,28 +19304,6 @@ MonoBehaviour:
   listenKey: 1
   resetKey: 114
   reactivateOnReset: 1
---- !u!114 &1357115043
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1357115039}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ffee061896614648b3128e34fd7d83d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  penModel: {fileID: 1037745430}
-  penTip: {fileID: 1437256449}
-  board: {fileID: 85819289}
-  uiCam: {fileID: 963194227}
-  surfaceGap: 0.002
-  planarOffset: {x: 0, y: 0}
-  modelEulerOffset: {x: 25, y: 0, z: 0}
-  smoothTime: 0.03
-  hideWhenOffBoard: 1
-  debugLog: 0
 --- !u!1001 &1367969782
 PrefabInstance:
   m_ObjectHideFlags: 0
