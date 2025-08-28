@@ -133,3 +133,11 @@ Satisfaction ratings: 3 participants rated 5/5, 2 rated 4/5. Average satisfactio
 Task feedback: Tasks 1–3 consistently smooth, reset worked but feedback felt abrupt.  
 Menu preference: 3 participants preferred Option A (finger menu), 2 preferred Option B (wrist menu).  
 Success: 100% task completion across participants. Success criteria achieved (≥80% completion, avg. satisfaction ≥4).
+
+# Iteration Summary
+In future development, the project will focus on expanding features and improving the overall user experience.  
+- Implement full layer editing functions, including adding, moving, merging, and hiding layers.  
+- Develop a functional wrist menu to replace the temporary canvas menu, aiming for more natural XR interaction.  
+- Enhance the UI design and polish the overall interface to make it more visually appealing and user-friendly.  
+- Add interactive effects (such as feedback animations or sounds) to strengthen immersion and responsiveness.  
+- Provide the ability to switch between different background scenes to give users more creative environments.  
