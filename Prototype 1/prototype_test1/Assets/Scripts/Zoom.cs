@@ -1,30 +1,40 @@
 using UnityEngine;
 
+/// <summary>
+/// Zoom.cs
+/// Attach this script to an object (World Space Canvas).
+/// Allows zooming in/out with the mouse scroll wheel, with options for:
+/// - Zoom around the mouse cursor
+/// - Custom zoom step, min/max scale
+/// - Inverted scroll direction
+/// </summary>
 public class Zoom : MonoBehaviour
 {
-    [Header("要缩放的根(默认=本物体，如你的 World Space Canvas)")]
+    [Header("Root object to scale (default = this object, e.g. your World Space Canvas)")]
     public Transform targetRoot;
 
-    [Header("用于计算射线的相机(默认=Canvas.worldCamera 或 MainCamera)")]
+    [Header("Camera used for ray calculations (default = Canvas.worldCamera or MainCamera)")]
     public Camera cam;
 
-    [Header("缩放参数")]
-    [Tooltip("每个滚轮单位对应的缩放比例(0.1≈10%)")]
-    public float zoomStep = 0.15f;          // 单步幅度（滚轮一格）
-    [Tooltip("相对初始大小的最小/最大倍数")]
-    public float minScaleMultiplier = 0.1f;  // 最小=初始的 0.1 倍
-    public float maxScaleMultiplier = 10f;   // 最大=初始的 10 倍
-    public bool zoomToMouse = true;          // 围绕鼠标缩放
-    [Tooltip("如方向相反可勾选：上滚缩小，下滚放大")]
+    [Header("Zoom Settings")]
+    [Tooltip("Scale factor per scroll step (0.1 ≈ 10%)")]
+    public float zoomStep = 0.15f;          // How much to scale for each scroll unit
+    [Tooltip("Min/max multiplier relative to initial size")]
+    public float minScaleMultiplier = 0.1f;  // Minimum = 0.1 × initial size
+    public float maxScaleMultiplier = 10f;   // Maximum = 10 × initial size
+    public bool zoomToMouse = true;          // Zoom around the mouse position
+    [Tooltip("Invert scroll direction (up = zoom out, down = zoom in)")]
     public bool invertScroll = false;
 
-    // 记录初始等比缩放
+    // Store the initial uniform scale of the object
     private float _baseScale = 1f;
 
     void Awake()
     {
+        // If no root is assigned, use this object's transform
         if (!targetRoot) targetRoot = transform;
 
+        // If no camera is assigned, try to find one
         if (!cam)
         {
             var canvas = GetComponentInParent<Canvas>();
@@ -34,37 +44,39 @@ public class Zoom : MonoBehaviour
                 cam = Camera.main;
         }
 
-        // 取初始等比缩放（World Space Canvas 常见为 0.01）
+        // Store the initial scale (for World Space Canvas, often 0.01)
         _baseScale = targetRoot.localScale.x;
         if (_baseScale <= 0f) _baseScale = 0.01f;
     }
 
     void Update()
     {
-        // 读取滚轮（优先新API，兼容旧轴）
+        // Get scroll input (new API first, fallback to legacy axis)
         float scroll = Input.mouseScrollDelta.y;
         if (Mathf.Approximately(scroll, 0f))
-            scroll = Input.GetAxis("Mouse ScrollWheel") * 120f; // 某些设备返回旧轴
+            scroll = Input.GetAxis("Mouse ScrollWheel") * 120f; // Some devices only support old axis
 
         if (invertScroll) scroll = -scroll;
-        if (Mathf.Abs(scroll) < 0.001f) return;  // 无滚动就不处理
+        if (Mathf.Abs(scroll) < 0.001f) return;  // Do nothing if no scroll input
 
-        // 当前大小（相对初始的倍数）
+        // Current scale (relative to the base scale)
         float currentMul = targetRoot.localScale.x / _baseScale;
 
-        // 幂函数实现平滑缩放：scroll>0 放大，scroll<0 缩小
+        // Exponential scaling: scroll > 0 = zoom in, scroll < 0 = zoom out
         float factor = Mathf.Pow(1f + Mathf.Max(0.0001f, zoomStep), scroll);
         float newMul = Mathf.Clamp(currentMul * factor, minScaleMultiplier, maxScaleMultiplier);
         if (Mathf.Approximately(newMul, currentMul)) return;
 
         float newScale = _baseScale * newMul;
 
-        // 围绕鼠标位置缩放：保持鼠标下的点不漂移
+        // Get world position of the mouse on a plane aligned with the canvas
         Vector3 pivotWorld = GetMouseWorldOnPlane();
         Vector3 localBefore = targetRoot.InverseTransformPoint(pivotWorld);
 
+        // Apply the new scale
         targetRoot.localScale = Vector3.one * newScale;
 
+        // Adjust position so the point under the mouse stays fixed
         if (zoomToMouse)
         {
             Vector3 worldAfter = targetRoot.TransformPoint(localBefore);
@@ -72,6 +84,10 @@ public class Zoom : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Finds the world position under the mouse cursor on a plane
+    /// that is aligned with the canvas or target object.
+    /// </summary>
     Vector3 GetMouseWorldOnPlane()
     {
         if (!cam) cam = Camera.main;

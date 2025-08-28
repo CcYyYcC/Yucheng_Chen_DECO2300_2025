@@ -1,49 +1,67 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-/// 让笔模型贴着“画板(RawImage)”平面，笔尖对齐鼠标命中点（仅展示，不影响绘制/点击）
+/// <summary>
+
+/// Purpose:
+/// Show a pen model on a World-Space RawImage board. The *pen tip* sticks
+/// to the mouse hit point on the board surface (visual only; does not affect drawing/clicks).
+///
+/// How it works (per frame when visible):
+/// 1) Raycast from the UI camera through the mouse to a plane defined by the board.
+/// 2) If the ray hits that plane and the hit lies inside the board's Rect, proceed.
+/// 3) Compute a desired rotation facing the board normal (plus an optional tilt).
+/// 4) Compute the desired *tip* world position (hit + small gap + optional planar offset).
+/// 5) Convert the tip's local offset to world space and back out the pen model pivot position,
+///    so the tip lands exactly on the surface.
+/// 6) Move (optionally smoothed) and rotate the model; hide if the mouse leaves the board.
+/// </summary>
 public class PenCursorOnBoard : MonoBehaviour
 {
-    [Header("引用（务必赋值）")]
-    public Transform penModel;      // 笔模型（建议无Collider，Layer=Ignore Raycast）
-    public Transform penTip;        // 笔尖子物体（局部位置放在笔尖）
-    public RawImage board;          // 画板 RawImage（World Space Canvas）
-    public Camera uiCam;            // 画板使用的摄像机（不填会自动找）
+    [Header("Refs (assign in Inspector)")]
+    public Transform penModel;      // The whole pen model (no Collider; Layer = Ignore Raycast recommended)
+    public Transform penTip;        // A child located at the pen tip (local position at contact point)
+    public RawImage board;          // The drawing board (RawImage on a World Space Canvas)
+    public Camera uiCam;            // Camera used for UI ray; auto-found if empty
 
-    [Header("外观与跟随")]
-    public float surfaceGap = 0.002f;        // 笔尖离画板表面留的微小间隙(米)，避免贴穿/Z-fighting
-    public Vector2 planarOffset = Vector2.zero; // 沿画板平面的小偏移 (x=board.right, y=board.up)
-    public Vector3 modelEulerOffset = new Vector3(25, 0, 0); // 额外姿态（让笔微微倾斜）
-    public float smoothTime = 0.03f;         // 位置平滑(秒)，设0为立即跟随
-    public bool hideWhenOffBoard = true;     // 鼠标不在画板范围时是否隐藏笔
+    [Header("Look & Follow")]
+    public float surfaceGap = 0.002f;           // Tiny gap above board to avoid z-fighting/penetration
+    public Vector2 planarOffset = Vector2.zero; // Along-board offset (x=board.right, y=board.up)
+    public Vector3 modelEulerOffset = new Vector3(25, 0, 0); // Extra tilt so the pen looks natural
+    public float smoothTime = 0.03f;            // Follow smoothing (0 = snap immediately)
+    public bool hideWhenOffBoard = true;        // Hide when mouse is outside the board rect
 
-    [Header("调试")]
+    [Header("Debug")]
     public bool debugLog = false;
 
-    private bool _visible;
-    private Vector3 _vel;
+    private bool _visible;   // Whether the visual is currently active
+    private Vector3 _vel;    // Velocity for SmoothDamp
 
     void Awake()
     {
-        // 自动补引用
+        // Auto-find the board from a Paint component if not assigned.
         if (!board)
         {
             var p = FindObjectOfType<Paint>();
             if (p) board = p.rawImage;
         }
+
+        // Auto-pick the camera: Canvas.worldCamera (World Space) else Camera.main.
         if (!uiCam && board && board.canvas && board.canvas.renderMode == RenderMode.WorldSpace)
             uiCam = board.canvas.worldCamera ? board.canvas.worldCamera : Camera.main;
 
-        Show(false); // 初始隐藏
+        Show(false); // Start hidden
     }
 
     void Update()
     {
+        // Do nothing if not supposed to be visible.
         if (!_visible) return;
 
+        // Basic reference checks.
         if (!penModel || !penTip || !board)
         {
-            if (debugLog) Debug.LogWarning("[PenCursor] 引用未设置：penModel/penTip/board。");
+            if (debugLog) Debug.LogWarning("[PenCursor] Missing refs: penModel/penTip/board.");
             return;
         }
 
@@ -51,13 +69,13 @@ public class PenCursorOnBoard : MonoBehaviour
         var cam = uiCam ? uiCam : Camera.main;
         if (!cam)
         {
-            if (debugLog) Debug.LogWarning("[PenCursor] 未找到摄像机，请给 uiCam 赋值。");
+            if (debugLog) Debug.LogWarning("[PenCursor] No camera. Assign uiCam.");
             return;
         }
 
-        // ① 鼠标射线与画板“平面”求交
+        // 1) Raycast from camera through mouse to the board plane.
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        Plane plane = new Plane(rt.forward, rt.position);
+        Plane plane = new Plane(rt.forward, rt.position); // Plane uses board forward + position
         if (!plane.Raycast(ray, out float enter))
         {
             if (hideWhenOffBoard) penModel.gameObject.SetActive(false);
@@ -65,7 +83,7 @@ public class PenCursorOnBoard : MonoBehaviour
         }
         Vector3 hitWorld = ray.origin + ray.direction * enter;
 
-        // ② 转到画板局部坐标，判断是否在 Rect 内
+        // 2) Convert hit to board local space and check if it's inside the Rect.
         Vector3 hitLocal = rt.InverseTransformPoint(hitWorld);
         Vector2 half = rt.rect.size * 0.5f;
         bool inside =
@@ -78,42 +96,50 @@ public class PenCursorOnBoard : MonoBehaviour
             return;
         }
 
-        // ③ 计算目标旋转：让笔朝向画板法线，再叠加自定义角度
+        // 3) Desired rotation: face the board normal (rt.forward) with rt.up as up, plus optional tilt.
         Quaternion targetRot = Quaternion.LookRotation(rt.forward, rt.up) * Quaternion.Euler(modelEulerOffset);
 
-        // ④ 目标“笔尖世界坐标” = 命中点 + 平面偏移 + 与板面的微小间隙
+        // 4) Desired pen tip world position: hit point + planar offset + small surface gap.
         Vector3 tipWorldTarget =
             hitWorld +
             rt.right * planarOffset.x +
             rt.up    * planarOffset.y +
             rt.forward * surfaceGap;
 
-        // ⑤ 用“笔尖→枢轴”的世界向量回推笔模型的位置
-        //    为得到正确的 TransformVector，这里先把模型旋转设为目标旋转
-        Quaternion oldRot = penModel.rotation;
+        // 5) Place the model so its *tip* lands on tipWorldTarget.
+        //    Temporarily set rotation so TransformVector uses the target orientation.
+        Quaternion oldRot = penModel.rotation; // (kept for parity; not used further)
         penModel.rotation = targetRot;
 
-        // 从枢轴到笔尖的“局部向量”转成“世界向量”（会考虑缩放/旋转）
+        // Convert the tip's local position to a world-space vector from the model pivot.
         Vector3 pivotToTipWorld = penModel.TransformVector(penTip.localPosition);
 
+        // Compute where the model pivot must be so that (pivot + pivotToTipWorld) == tipWorldTarget.
         Vector3 modelPosTarget = tipWorldTarget - pivotToTipWorld;
 
-        // ⑥ 平滑/直接设置位置，并最终保持目标旋转
+        // 6) Move and rotate the model (optionally smoothed). Ensure active when inside.
         if (smoothTime > 0f)
             penModel.position = Vector3.SmoothDamp(penModel.position, modelPosTarget, ref _vel, smoothTime);
         else
             penModel.position = modelPosTarget;
 
-        penModel.rotation = targetRot; // 最终旋转
+        penModel.rotation = targetRot;
+
         if (!penModel.gameObject.activeSelf) penModel.gameObject.SetActive(true);
     }
 
-    /// 供按钮调用：显示/隐藏
+    /// <summary>
+    /// Show or hide the visual pen.
+    /// Call this from your Pen button (true) and hide it on other actions (false).
+    /// </summary>
     public void Show(bool on)
     {
         _visible = on;
         if (penModel) penModel.gameObject.SetActive(on);
     }
 
+    /// <summary>
+    /// Toggle visibility (handy for quick testing).
+    /// </summary>
     public void Toggle() => Show(!_visible);
 }

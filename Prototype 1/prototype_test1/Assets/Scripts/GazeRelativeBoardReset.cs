@@ -1,37 +1,56 @@
 using UnityEngine;
 
-/// 开场记录：画板相对于“玩家相机”的位姿；
-/// 重置：依据“当前相机姿态”恢复到当初的相对位姿（与当前视线一致）。
+/// <summary>
+/// GazeRelativeBoardReset (Beginner-friendly comments, no logic changes)
+/// --------------------------------------------------------------------
+/// Purpose:
+/// - At startup, record the board's pose *relative to the player's camera*.
+/// - When resetting, place the board back to that same relative pose,
+///   but relative to the camera's *current* pose (so it always appears
+///   in front of where the player is looking now).
+/// </summary>
 public class GazeRelativeBoardReset : MonoBehaviour
 {
-    [Header("玩家相机（不填则用 Camera.main）")]
+    [Header("Player camera (leave empty to use Camera.main)")]
     public Transform cameraT;
 
-    [Header("画板根节点（要被放置/旋转/缩放的对象）")]
+    [Header("Board root (the object to place/rotate/scale)")]
     public Transform board;
 
-    [Header("热键（可由外部调用 ResetNow 替代）")]
+    [Header("Hotkey (you can also call ResetNow() from other scripts)")]
     public bool listenKey = true;
     public KeyCode resetKey = KeyCode.R;
 
-    [Header("复位前若画板被隐藏则先激活")]
+    [Header("If board is inactive, reactivate before resetting")]
     public bool reactivateOnReset = true;
 
-    // —— 开场记录的“相机坐标系下”的相对位姿 —— //
-    Vector3    initPos_inCam;   // 画板在相机局部坐标中的位置 (x=右, y=上, z=前)
-    Quaternion initRot_inCam;   // 相机到画板的相对旋转
-    Vector3    initLocalScale;  // 画板自身缩放（保持不变）
+    // ---- Data captured at startup, in the camera's local space ----
+    // We store the board's *relative* transform w.r.t. the camera:
+    //   - initPos_inCam : board position in camera local space
+    //   - initRot_inCam : rotation offset from camera to board
+    //   - initLocalScale: board's local scale (kept as-is)
+    Vector3    initPos_inCam;   // x = right, y = up, z = forward (camera-local)
+    Quaternion initRot_inCam;   // rotation from camera to board
+    Vector3    initLocalScale;  // board's localScale (unchanged on reset)
 
-    bool inited;
-    bool pendingReset;          // 用于把按键重置延后到 LateUpdate（确保玩家/相机已先复位）
+    bool inited;                // did we capture the initial state?
+    bool pendingReset;          // defer reset to LateUpdate (after others moved)
 
     void Awake()
     {
+        // Auto-pick the camera if none assigned
         if (!cameraT && Camera.main) cameraT = Camera.main.transform;
+
+        // Capture the initial relative transform right away
         CaptureInitial();
     }
 
-    /// 记录“当前”为初始：将画板的世界位姿投到相机坐标系下
+    /// <summary>
+    /// Capture the *current* board pose as the new initial:
+    /// - Convert board's world position into camera-local (InverseTransformPoint)
+    /// - Store the rotation offset from camera to board (inv(camRot) * boardRot)
+    /// - Remember board.localScale
+    /// </summary>
     [ContextMenu("Capture Initial (Record Now)")]
     public void CaptureInitial()
     {
@@ -46,18 +65,30 @@ public class GazeRelativeBoardReset : MonoBehaviour
 
     void Update()
     {
+        // Optionally listen for a hotkey; just set a flag here.
+        // We actually perform the reset in LateUpdate to ensure
+        // the camera/player has finished any own movement this frame.
         if (!listenKey || !inited) return;
         if (Input.GetKeyDown(resetKey)) pendingReset = true;
     }
 
     void LateUpdate()
     {
+        // Perform the reset after all Update() calls (and after the camera
+        // potentially moved this frame), so placement uses the latest camera pose.
         if (!pendingReset) return;
         pendingReset = false;
-        ResetNow();  // 放到 LateUpdate，保证相机/玩家先完成自身的 Reset
+        ResetNow();
     }
 
-    /// 外部可直接调用：依据“当前相机姿态”恢复到开场相对位姿
+    /// <summary>
+    /// Reset the board to the *initial relative pose*, but relative to the
+    /// camera's *current* transform:
+    ///   worldPos = cam.TransformPoint(initPos_inCam)
+    ///   worldRot = cam.rotation * initRot_inCam
+    ///   localScale = initLocalScale
+    /// Optionally re-activate the board if it was hidden.
+    /// </summary>
     [ContextMenu("Reset Now")]
     public void ResetNow()
     {

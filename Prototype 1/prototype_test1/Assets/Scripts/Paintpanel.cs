@@ -2,47 +2,56 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 仅负责“绘图 UI 面板”的交互逻辑：
-/// - 颜色选择、清空、橡皮切换、回到画笔、关闭面板；
-/// - 滑条统一控制笔/橡皮粗细；
-/// - “重置”按钮不再直接改 Transform，而是转发给 ResetManager（避免冲突/失效）
+/// Responsibility:
+/// - Wires up the PAINT UI panel: color buttons, Clear, Eraser toggle, Pen button, Close panel,
+///   Reset (forwarded), and the brush-size Slider.
+/// - Shows a visual cursor model for the pen or eraser (purely visual; does not affect drawing).
+/// - For Reset: **does not** move the board here; it forwards to an external ResetManager,
+///   so there is only one place that owns "reset" logic.
+///
+/// Notes:
+/// - This script depends on a separate `Paint` component (the actual drawing logic).
+/// - `PenCursorOnBoard` / `EraserCursorOnBoard` are optional visual helpers.
+/// - It keep an internal `assumedEraser` flag because `Paint` doesn’t expose `IsEraser`.
 /// </summary>
 public class PaintPanel : MonoBehaviour
 {
-    [Header("目标绘制脚本（画笔逻辑）")]
-    public Paint paint;
+    [Header("Target drawing logic")]
+    public Paint paint; // The Paint component that handles drawing on a RawImage
 
-    [Header("颜色按钮（Image 的颜色即为画笔色）")]
+    [Header("Color buttons (the Image.color will be used as brushColor)")]
     public Button[] colorButtons;
 
-    [Header("清空 / 橡皮(切换) / 笔 / 关闭 / 复位（转发）")]
-    public Button clearButton;
-    public Button eraserToggleButton;     // 橡皮 ↔ 画笔 切换
-    public Button penButton;              // 一键回到“画笔”
-    public Button closePaintPanel;        // 关闭本 UI 面板
-    public Button resetCanvasButton;      // 转发给 ResetManager 的“复位”按钮
+    [Header("Clear / Eraser(toggle) / Pen / Close / Reset(forward)")]
+    public Button clearButton;        // Clears the canvas (to backgroundColor)
+    public Button eraserToggleButton; // Switch eraser <-> brush on the Paint
+    public Button penButton;          // Force back to brush mode (if currently erasing)
+    public Button closePaintPanel;    // Hide this UI panel GameObject
+    public Button resetCanvasButton;  // Forward a Reset call to ResetManager
 
-    [Header("笔刷粗细滑条（建议最小1，最大128）")]
+    [Header("Brush size Slider (recommended 1..128)")]
     public Slider sizeSlider;
 
-    [Header("外部复位管理器（独立存在，优先级最高）")]
-    public ResetManager resetManager;
+    [Header("External Reset Manager (single source of truth for reset)")]
+    public ResetManager resetManager; // Owns the actual Transform reset logic
 
-    // —— 新增：展示用游标（笔/橡皮），不影响绘制逻辑 —— //
-    [Header("展示用：笔/橡皮模型显隐控制")]
-    public PenCursorOnBoard penCursor;      // 挂载了笔模型的实例
-    public EraserCursorOnBoard eraserCursor;   // 挂载了橡皮模型的实例
+    // ---- Visual cursors (purely cosmetic; do not change draw logic) ----
+    [Header("Visual-only: show/hide models for pen & eraser")]
+    public PenCursorOnBoard penCursor;        // Instance that moves a pen model under mouse
+    public EraserCursorOnBoard eraserCursor;  // Instance that moves an eraser model under mouse
 
-    // 仅用于 UI 同步当前“我们认为的工具状态”（如果 Paint 没暴露 IsEraser）
+    // Internal UI state: what we *assume* the current tool is (since Paint has no IsEraser getter).
     private bool assumedEraser = false;
 
     void Awake()
     {
-        // 找不到 Paint 就禁用，避免空引用
+        // Ensure we have a Paint target. If not found, disable this component to avoid null refs.
         if (!paint) paint = FindObjectOfType<Paint>();
-        if (!paint) { Debug.LogError("[PaintPanel] 未找到 Paint 组件。"); enabled = false; return; }
+        if (!paint) { Debug.LogError("[PaintPanel] Paint component not found."); enabled = false; return; }
 
-        // —— 颜色按钮：点击即把其 Image.color 设置为画笔色 —— //
+        // ---------------------- Color buttons wiring ----------------------
+        // Each color button uses its Image.color as the new brushColor for Paint.
+        // Important: color selection does NOT show/hide any cursor visuals.
         if (colorButtons != null)
         {
             foreach (var btn in colorButtons)
@@ -50,87 +59,120 @@ public class PaintPanel : MonoBehaviour
                 if (!btn) continue;
                 var img = btn.GetComponent<Image>();
                 var c = img ? img.color : Color.black;
+
+                // Closure-safe capture: we copy 'c' to a local variable per iteration above.
                 btn.onClick.AddListener(() => paint.SetColor(c));
-                // 颜色按钮不改变游标显隐
             }
         }
 
-        // 清空画布
+        // -------------------------- Clear button --------------------------
+        // Clears the paint texture to backgroundColor.
+        // Also hide any active visual cursor to avoid confusing states.
         if (clearButton)
+        {
             clearButton.onClick.AddListener(() =>
             {
                 paint.ClearTexture();
-                // 触发其他功能时：两种游标均隐藏
-                if (penCursor) penCursor.Show(false);
+                if (penCursor)    penCursor.Show(false);
                 if (eraserCursor) eraserCursor.Show(false);
             });
+        }
 
-        // 橡皮 ↔ 画笔 切换（调用 Paint 的 ToggleEraser）
+        // -------------------- Eraser <-> Brush toggle ---------------------
+        // Calls Paint.ToggleEraser() and flips our local assumed flag.
+        // Visual policy: when switching to eraser, show eraser cursor and hide pen cursor.
         if (eraserToggleButton)
+        {
             eraserToggleButton.onClick.AddListener(() =>
             {
                 paint.ToggleEraser();
                 assumedEraser = !assumedEraser;
 
-                // 显示橡皮游标、隐藏笔游标
                 if (eraserCursor) eraserCursor.Show(true);
                 if (penCursor)    penCursor.Show(false);
             });
+        }
 
-        // “笔”按钮：如果当前是橡皮，则再切一次回到画笔
+        // -------------------------- Pen button ----------------------------
+        // If we think we are in eraser mode, toggle again to return to brush.
+        // Visual policy: when switching to pen, show pen cursor and hide eraser cursor.
         if (penButton)
+        {
             penButton.onClick.AddListener(() =>
             {
                 if (assumedEraser)
                 {
-                    paint.ToggleEraser();
+                    paint.ToggleEraser(); // back to brush
                     assumedEraser = false;
                 }
-                // 显示笔游标、隐藏橡皮游标
+
                 if (penCursor)    penCursor.Show(true);
                 if (eraserCursor) eraserCursor.Show(false);
             });
+        }
 
-        // 关闭本 UI 面板（注意：只是隐藏 UI，不影响 ResetManager 工作）
+        // ------------------------- Close panel ----------------------------
+        // Only hides THIS UI panel (SetActive(false)).
+        // Also hides visual cursors (so nothing hovers when panel is closed).
         if (closePaintPanel)
+        {
             closePaintPanel.onClick.AddListener(() =>
             {
-                // 关闭面板时游标也隐藏
                 if (penCursor)    penCursor.Show(false);
                 if (eraserCursor) eraserCursor.Show(false);
                 gameObject.SetActive(false);
             });
+        }
 
-        // 粗细滑条：统一控制笔/橡皮的粗细（Paint 里要确保 SetBrushSize 同步两者）
+        // ----------------------- Brush size Slider ------------------------
+        // Single source for brush/eraser thickness: Paint.SetBrushSize controls the radius.
+        // We guard min/max and use whole numbers for stable pixel sizes.
         if (sizeSlider)
         {
-            // 基本边界与整数步进
             if (sizeSlider.minValue <= 0f) sizeSlider.minValue = 1f;
             if (sizeSlider.maxValue < sizeSlider.minValue) sizeSlider.maxValue = 128f;
             sizeSlider.wholeNumbers = true;
 
-            // 初始值与回调
+            // Initialize the slider GUI to match Paint’s current radius.
             sizeSlider.value = Mathf.Clamp(paint.brushRadius, sizeSlider.minValue, sizeSlider.maxValue);
+
+            // Hook change: pushing size back into Paint (which affects both brush & eraser).
             sizeSlider.onValueChanged.AddListener(v => paint.SetBrushSize(v));
         }
 
-        // “复位”按钮转发：调用 ResetManager（不要直接在这里改 Transform，避免与 ResetManager 冲突）
+        // ----------------------------- Reset ------------------------------
+        // Do NOT move/rotate/scale anything here. We forward to ResetManager
+        // so there is a single authority for "reset" logic (prevents conflicts).
+        // Also hide cursors so the board returns clean.
         if (resetCanvasButton)
+        {
             resetCanvasButton.onClick.AddListener(() =>
             {
-                // 复位时游标隐藏
                 if (penCursor)    penCursor.Show(false);
                 if (eraserCursor) eraserCursor.Show(false);
-                resetManager?.ResetNow();
+                resetManager?.ResetNow(); // Safe call (?.) if ResetManager not assigned
             });
+        }
     }
 
     void OnEnable()
     {
-        // 打开面板时，同步一次滑条显示值（避免外部改过 brushRadius 导致显示不同步）
+        // When the panel re-opens, update the slider display to the current brushRadius
+        // without firing the onValueChanged callback (so we don’t re-apply it).
         if (sizeSlider) sizeSlider.SetValueWithoutNotify(paint.brushRadius);
     }
 
-    void OnDisable() { if (penCursor) penCursor.Show(false); if (eraserCursor) eraserCursor.Show(false); }
-    void OnDestroy() { if (penCursor) penCursor.Show(false); if (eraserCursor) eraserCursor.Show(false); }
+    void OnDisable()
+    {
+        // If the panel is hidden/disabled, also hide the visual cursors to avoid floating models.
+        if (penCursor)    penCursor.Show(false);
+        if (eraserCursor) eraserCursor.Show(false);
+    }
+
+    void OnDestroy()
+    {
+        // Same as OnDisable: ensure visuals are hidden if this component is destroyed.
+        if (penCursor)    penCursor.Show(false);
+        if (eraserCursor) eraserCursor.Show(false);
+    }
 }
