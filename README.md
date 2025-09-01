@@ -153,3 +153,36 @@ If any of these steps are unclear or incomplete, discuss with the teaching team.
 - Add minimal but effective visual feedback to menus and gestures  
 - Define specific testing tasks (~5 min each) aligned with research aims  
 - Prepare Git commits and documentation for testing outcomes  
+
+# Week 5 Activity Log – XR App Concept Development
+
+## Project Title  
+**XR Extension of Procreate**
+
+## Overview  
+In Week 5, the focus was on running the first formal round of user testing for Prototype 1. The prototype was implemented in Unity using keyboard and mouse to simulate XR interactions. The goal was to evaluate how intuitive the core interactions felt, including canvas manipulation, tool switching, and reset functions. Feedback from five participants was collected through task-based testing, think-aloud protocols, and short interviews. This week also marked the beginning of iteration planning based on concrete user feedback.
+
+## Activities  
+- **Conducted User Tests**  
+  - Recruited 5 participants to test Prototype 1.  
+  - Assigned three main tasks: zoom/reposition canvas, draw/erase with tools, and use reset/clear functions.  
+  - Collected both quantitative data (time, errors, success rate) and qualitative feedback (satisfaction, feelings).  
+
+- **Documented Feedback**  
+  - Recorded test results in a structured table.  
+  - Summarised feedback into satisfaction ratings (average 4.4/5) and improvement suggestions.  
+  - Identified split preference between menu styles: 3 participants preferred finger menu, 2 preferred wrist menu.  
+
+- **Analysis & Reflection**  
+  - Positive findings: canvas manipulation and tool switching were consistently rated smooth and natural.  
+  - Pain points: reset function felt abrupt, accidental “clear” could cause frustration, lack of on-screen instructions.  
+  - Users suggested: clearer feedback animations, shortcut guides, more realistic pen features (e.g., tilt, variable brush size).  
+
+## Key Insights  
+1. **Canvas interaction works reliably**, but visual/haptic feedback is needed to enhance immersion.  
+2. **Menu design remains undecided**; future iterations should test wrist vs finger menu in XR.  
+3. **Error prevention is important**; features like undo/redo and confirmation prompts for clear actions are necessary.  
+4. **Users want realism**; pen tilt, brush thickness control, and interactive effects would make the experience more authentic.  
+
+## Reflection  
+Week 5 marked a significant milestone in validating the prototype’s usability. The results confirmed that the basic interaction model is functional and intuitive, meeting the success criteria for user testing. However, it also revealed important areas for improvement, such as richer feedback systems, more robust tool management, and features to prevent mistakes. These insights directly informed the iteration summary, which prioritises implementing layer editing, developing the wrist menu, polishing UI, adding interactive effects, and supporting scene switching in future versions.
