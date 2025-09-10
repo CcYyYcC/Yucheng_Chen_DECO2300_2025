@@ -8,9 +8,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Week6_Scene.unity
     guid: 47db06efdaaf64a62be9ba60a2365e23
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MainSceneOfBoard.unity
     guid: fb230291534f64d7fa190c6cab092fcb
+  - enabled: 0
+    path: Assets/Scenes/SampleScene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/WhiteBoard.unity
+    guid: 2332ea3db9e794cfeb4a75b6c59f5427
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 9e04141008b914560a0a0e76ef91084a, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: b4ed9613ba34848d089964d58ce713f4, type: 2}
