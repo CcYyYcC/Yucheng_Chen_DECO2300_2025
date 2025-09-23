@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Board
   - Whiteboard
+  - controllor
   layers:
   - Default
   - TransparentFX
