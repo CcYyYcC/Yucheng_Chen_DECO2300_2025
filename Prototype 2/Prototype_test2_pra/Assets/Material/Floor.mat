@@ -74,7 +74,11 @@ Material:
     m_Colors:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     - _Color: {r: 0.42452818, g: 0.42452818, b: 0.42452818, a: 0}
+=======
+    - _Color: {r: 0.3455882, g: 0.3455882, b: 0.3455882, a: 1}
+>>>>>>> parent of b73e92fa (update draw function and some new items)
 =======
     - _Color: {r: 0.3455882, g: 0.3455882, b: 0.3455882, a: 1}
 >>>>>>> parent of b73e92fa (update draw function and some new items)
