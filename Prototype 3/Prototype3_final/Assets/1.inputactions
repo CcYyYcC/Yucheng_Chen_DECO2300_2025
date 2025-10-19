@@ -1,0 +1,82 @@
+{
+    "name": "1",
+    "maps": [
+        {
+            "name": "New action map",
+            "id": "9894c627-d4c9-4db3-bf0e-06d678c2fdc8",
+            "actions": [
+                {
+                    "name": "2",
+                    "type": "Button",
+                    "id": "ae81383a-cb6e-46d1-9d03-ab77a62b9ad3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press,Hold",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "b39ec102-5422-4db6-a2db-0555e48be37c",
+                    "path": "<XRController>/{PrimaryButton}",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "LeftHandMenu",
+            "id": "f7bd19a3-b73b-412d-84f4-340f81a2f919",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "24652859-ff34-473e-a182-39447c4ca4eb",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Menu",
+                    "type": "Button",
+                    "id": "380adb0d-04fb-42b3-8027-57446f73027d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a49cbf52-fb7e-42e4-9acc-37d78dbe14a6",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "New action",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9ea71c85-9d63-4b2b-829b-33357741b248",
+                    "path": "<XRController>{LeftHand}/menu",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
