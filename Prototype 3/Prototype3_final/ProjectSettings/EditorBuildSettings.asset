@@ -14,9 +14,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/WhiteBoard.unity
     guid: 2332ea3db9e794cfeb4a75b6c59f5427
+  - enabled: 1
+    path: Assets/Scenes/Scene0.unity
+    guid: 047346ebe0e39418b8a8f82a39969ad0
   - enabled: 1
     path: Assets/Scenes/Scene1.unity
     guid: 7b3dedfd7c6b54024a5b63c2e1415296
