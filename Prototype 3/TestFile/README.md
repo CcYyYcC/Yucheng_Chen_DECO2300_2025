@@ -1,120 +1,55 @@
-# Test Feedback – Summary of 5 Participants
+# Interactive Prototype 3 – Test Results and Conclusion
 
-Here are the [Testing Plan for Interactive Prototype 2](./Testing%20Plan%20for%20IP2.pdf) and the [TestTable for ProtoType2](./TestTable_IP2.md).
+### 🔗 Linked User Questionnaires
+All participant feedback forms are available in the same directory under the folder:  
+[`./Test_QuestionnaireData/`](./Test_QuestionnaireData/)
 
-Below is the test feedback.
+| Participant | File Name | Link |
+|--------------|------------|------|
+| User 1 | `TestQuestionnaire_IP3_user1.pdf` | [Open](./Test_QuestionnaireData/TestQuestionnaire_IP3_user1.pdf) |
+| User 2 | `TestQuestionnaire_IP3_user2.pdf` | [Open](./Test_QuestionnaireData/TestQuestionnaire_IP3_user2.pdf) |
+| User 3 | `TestQuestionnaire_IP3_user3.pdf` | [Open](./Test_QuestionnaireData/TestQuestionnaire_IP3_user3.pdf) |
+| User 4 | `TestQuestionnaire_IP3_user4.pdf` | [Open](./Test_QuestionnaireData/TestQuestionnaire_IP3_user4.pdf) |
+| User 5 | `TestQuestionnaire_IP3_user5.pdf` | [Open](./Test_QuestionnaireData/TestQuestionnaire_IP3_user5.pdf) |
 
-
-## Participant 1  
-
-| Task No. | Task Description | Completion Time (sec) | Success (Y/N) | Errors | Gesture/Control Accuracy (1–5) | Satisfaction (1–5) | Notes/Comments |
-|----------|------------------|------------------------|---------------|--------|--------------------------------|--------------------|----------------|
-| 1 | Use the 3D pen model to draw a simple shape | 25 | Y | None | 4 | 5 | Drawing felt smooth and natural. |
-| 2 | Erase part of the drawing using two eraser effects | 30 | Y | None | 4 | 4 | Soft eraser worked well, hard eraser less intuitive. |
-| 3 | Press the physical reset button (check sound + function) | 15 | Y | Button base detached once | 3 | 3 | Button sometimes unstable. |
-| 4 | Open the wrist menu using the controller menu button | 10 | Y | No functional tools | 4 | 3 | Easy to open, but no active functions. |
-| 5 | Remote grab a tool, release it to float, comment on convenience | 20 | Y | None | 5 | 5 | Remote grab very convenient, tools floating in place was useful. |
 
 ---
 
-## Participant 2  
+## Conclusion
 
-| Task No. | Task Description | Completion Time (sec) | Success (Y/N) | Errors | Gesture/Control Accuracy (1–5) | Satisfaction (1–5) | Notes/Comments |
-|----------|------------------|------------------------|---------------|--------|--------------------------------|--------------------|----------------|
-| 1 | Use the 3D pen model to draw a simple shape | 28 | Y | None | 4 | 4 | Pen drawing was smooth and accurate. |
-| 2 | Erase part of the drawing using two eraser effects | 32 | Y | None | 5 | 5 | Soft eraser provided very natural correction. |
-| 3 | Press the physical reset button (check sound + function) | 18 | Y | Sound missing once | 4 | 3 | Function clear, but inconsistent sound feedback. |
-| 4 | Open the wrist menu using the controller menu button | 12 | Y | No functions | 4 | 3 | Placement was comfortable, but functions missing. |
-| 5 | Remote grab a tool, release it to float, comment on convenience | 22 | Y | None | 5 | 5 | Floating tools felt efficient and helpful. |
+The testing of **Interactive Prototype 3** demonstrated that introducing multi-modal physical interactions—drawer pulling, shutter door hinging, lever-based scene switching, and dynamic camera height adjustment—significantly improved perceived realism and spatial immersion compared to the previous version.  
+All four participants rated the prototype highly in terms of **ease of use** and **responsiveness**, with most scores falling between 4–5 across interaction types. The **drawer** and **lever** interactions were consistently mentioned as the most satisfying, praised for their natural physics and smooth control.  
 
----
+Participants described the experience as *“highly polished and immersive”*, *“very realistic, easy to use”*, and *“smooth and engaging”*. Several noted that the lever feedback and fade transition between scenes provided a clear sense of environmental change, reinforcing realism. The **camera height adjustment** was recognized as intuitive and helped participants feel more in control of their spatial positioning.
 
-## Participant 3  
+However, a few areas for improvement were identified:
 
-| Task No. | Task Description | Completion Time (sec) | Success (Y/N) | Errors | Gesture/Control Accuracy (1–5) | Satisfaction (1–5) | Notes/Comments |
-|----------|------------------|------------------------|---------------|--------|--------------------------------|--------------------|----------------|
-| 1 | Use the 3D pen model to draw a simple shape | 24 | Y | None | 4 | 5 | Drawing was easy and responsive. |
-| 2 | Erase part of the drawing using two eraser effects | 33 | Y | None | 4 | 4 | Worked, though eraser felt slightly slow at times. |
-| 3 | Press the physical reset button (check sound + function) | 20 | Y | Button hard to press | 3 | 3 | Physical press felt too stiff. |
-| 4 | Open the wrist menu using the controller menu button | 11 | Y | No functions | 4 | 3 | Opened easily, but lacked real interaction. |
-| 5 | Remote grab a tool, release it to float, comment on convenience | 25 | Y | None | 5 | 5 | Remote grab was very intuitive and satisfying. |
+- The **drawer** felt slightly too sensitive for some users; adding light resistance could improve tactile realism.  
+- The **shutter door** could be smoother when opening and closing.  
+- Multiple participants suggested **audio or haptic feedback** for better confirmation of lever activation and object motion.  
+- Visual highlights or guidelines could help users quickly locate interactive components during first-time use.  
+
+Overall, Prototype 3 successfully validated the feasibility of combining multiple embodied, physics-based interactions to enhance immersion and realism in XR creative environments. The results indicate that users respond positively to tangible, spatially-aware mechanics that mirror real-world affordances, supporting the next stage of refinement.
 
 ---
 
-## Participant 4  
+## Iteration Summary
 
-| Task No. | Task Description | Completion Time (sec) | Success (Y/N) | Errors | Gesture/Control Accuracy (1–5) | Satisfaction (1–5) | Notes/Comments |
-|----------|------------------|------------------------|---------------|--------|--------------------------------|--------------------|----------------|
-| 1 | Use the 3D pen model to draw a simple shape | 27 | Y | Canvas penetrated | 3 | 3 | Drawing smooth but canvas could be drawn through. |
-| 2 | Erase part of the drawing using two eraser effects | 35 | Y | None | 4 | 4 | Soft eraser effect was effective. |
-| 3 | Press the physical reset button (check sound + function) | 17 | Y | Sound missing | 3 | 3 | Button feedback inconsistent. |
-| 4 | Open the wrist menu using the controller menu button | 13 | Y | No functions | 4 | 3 | Menu position acceptable, but features missing. |
-| 5 | Remote grab a tool, release it to float, comment on convenience | 21 | Y | None | 5 | 5 | Tool floating improved efficiency, especially switching tools. |
+Based on participant feedback and observed usability issues, the next iteration will focus on:
 
----
+### Enhancing Physical Realism
+- Add **slight resistance or friction** to drawer movement for natural tactile feedback.  
+- Refine **shutter hinge joint limits** to create smoother open-close transitions.  
+- Introduce **consistent audio and haptic feedback** for lever pulls and cabinet movement.
 
-## Participant 5  
+### Improving Guidance and Clarity
+- Add **visual cues or highlight outlines** for interactable elements.  
+- Display **on-screen hints or tutorial prompts** when users first interact with the environment.  
 
-| Task No. | Task Description | Completion Time (sec) | Success (Y/N) | Errors | Gesture/Control Accuracy (1–5) | Satisfaction (1–5) | Notes/Comments |
-|----------|------------------|------------------------|---------------|--------|--------------------------------|--------------------|----------------|
-| 1 | Use the 3D pen model to draw a simple shape | 26 | Y | None | 4 | 4 | Drawing comfortable, no major issues. |
-| 2 | Erase part of the drawing using two eraser effects | 34 | Y | None | 4 | 4 | Erasing effective, but less smooth than drawing. |
-| 3 | Press the physical reset button (check sound + function) | 19 | Y | Hard to press, sound missing | 3 | 3 | Sometimes required extra force, reduced immersion. |
-| 4 | Open the wrist menu using the controller menu button | 10 | Y | No functions | 4 | 3 | Natural to open, but not functional yet. |
-| 5 | Remote grab a tool, release it to float, comment on convenience | 23 | Y | None | 5 | 5 | Remote grab felt realistic and highly convenient. |
+### Camera and Comfort Refinement
+- Calibrate **camera height adjustment sensitivity** to prevent over-movement.  
+- Offer a quick **“reset height”** option for accessibility and comfort.  
 
----
-
-## Summary Results  
-
-| Task No. | Task Description | Avg. Completion Time (sec) | Success Rate | Common Errors | Avg. Accuracy (1–5) | Avg. Satisfaction (1–5) | Key Observations |
-|----------|------------------|----------------------------|--------------|---------------|----------------------|--------------------------|------------------|
-| 1 | Use the 3D pen model to draw a simple shape | ~26 | 100% | Canvas penetration (P4) | 4.0 | 4.2 | Drawing smooth and responsive overall; one canvas collision issue. |
-| 2 | Erase part of the drawing using two eraser effects | ~33 | 100% | Slight delay or less intuitive for some | 4.2 | 4.4 | Soft eraser praised, hard eraser less intuitive. |
-| 3 | Press the physical reset button (check sound + function) | ~18 | 100% | Hard to press, detachment, missing sound | 3.2 | 3.2 | Clear function but poor reliability; inconsistent audio reduced immersion. |
-| 4 | Open the wrist menu using the controller menu button | ~11 | 100% | No functions implemented | 4.0 | 3.0 | Easy to open and position okay, but not functional. |
-| 5 | Remote grab a tool, release it to float, comment on convenience | ~22 | 100% | None | 5.0 | 5.0 | Strongest feature; tool floating highly convenient and efficient. |
-
-
-## Conclusion  
-
-The testing of Interactive Prototype 2 demonstrated that core XR interactions such as **drawing with the pen**, **erasing**, and **remote grabbing tools** were highly effective and provided participants with a satisfying experience. In particular, the **remote grab and floating tools** were consistently highlighted as the most convenient feature, supporting fluid workflows.  
-
-However, several areas require improvement:  
-- The **physical reset button** was sometimes difficult to press and occasionally lost alignment between the pusher and base. Audio feedback was also inconsistent, which reduced immersion.  
-- The **wrist menu** could be opened reliably but lacked functional tools, limiting its usefulness in testing.  
-- Minor issues with **canvas collision and penetration** affected the drawing experience for some participants.  
-
-Overall, Prototype 2 successfully validated key XR interactions, while also providing actionable insights for iteration.  
-
----
-
-## Iteration Summary  
-
-Based on participant feedback and observed issues, the next iteration will focus on:  
-
-- **Enhancing pen drawing experience**  
-  - [ ] Add pen stroke sound effects for realism.  
-  - [ ] Introduce haptic feedback (controller vibration) to simulate contact with the canvas.  
-  - [ ] Improve collision detection to prevent pen passing through the canvas.  
-
-- **Expanding wrist menu functionality**  
-  - [ ] Implement actual menu tools (pen, eraser, reset, color picker).  
-  - [ ] Add customization features such as brush size and opacity.  
-  - [ ] Provide better visual and positional feedback when opening the menu.  
-
-- **Optimizing physical buttons**  
-  - [ ] Refine button mechanics to prevent pusher/base separation.  
-  - [ ] Ensure consistent audio feedback when pressed.  
-  - [ ] Add functional mappings such as **toggle passthrough**, **switch scenes**, and **return to homepage**.  
-
-- **Introducing a main menu / onboarding system**  
-  - [ ] Add a **homepage scene** with clear navigation.  
-  - [ ] Provide **tutorial or guidance instructions** on how to use tools and menus.  
-  - [ ] Include visual indicators for key actions (e.g., press here, grab here).  
-
-- **Additional improvements**  
-  - [ ] Optimize performance for smoother frame rates.  
-  - [ ] Ensure multi-user testing stability (reduce crash risk).  
-  - [ ] Expand toolset (e.g., different brush styles, fill tool) for future evaluation.  
-
+### Future Development
+- Combine all cabinet interactions into a **modular environment test** to study cumulative physical engagement.  
+- Experiment with **multi-user scenarios** to evaluate collaborative spatial awareness and shared control dynamics.  
