@@ -1,29 +1,66 @@
 using UnityEngine;
 
-/// 按住指定按钮，上下抬手 ⇒ 仅调整 OVRCameraRig.TrackingSpace 的本地Y偏移；
-/// 松手后保持在新高度，不再变化。
+/// <summary>
+/// Simple height adjustment script for Meta/Oculus rigs.
+///
+/// ▶ How it works:
+/// Hold the selected button (default = right thumbstick),
+/// then move your controller up or down to raise or lower your view height.
+/// When you release the button, the new height stays fixed.
+///
+/// This script only changes the Y position of the OVRCameraRig’s TrackingSpace,
+/// so your whole view moves up or down together.
+/// </summary>
 public class BB_ViewHeightAdjuster : MonoBehaviour
 {
     [Header("OVR / Building Blocks")]
-    public OVRCameraRig cameraRig;                 // 场景里的 OVRCameraRig（[BuildingBlock] Camera Rig）
-    public Transform controller;                    // 用来测量位移的手柄(如 RightHandAnchor)
+    /// <summary>
+    /// The OVRCameraRig in your scene.  
+    /// If not assigned, the script will try to find one automatically.
+    /// </summary>
+    public OVRCameraRig cameraRig;
+
+    /// <summary>
+    /// The controller used to measure up/down movement (for example, RightHandAnchor).
+    /// </summary>
+    public Transform controller;
 
     [Header("Input")]
-    public OVRInput.RawButton holdButton = OVRInput.RawButton.RThumbstick; // 右摇杆按压
+    /// <summary>
+    /// The button you need to hold while changing height.  
+    /// Default: Right thumbstick press.
+    /// </summary>
+    public OVRInput.RawButton holdButton = OVRInput.RawButton.RThumbstick;
 
     [Header("Tuning")]
-    public float sensitivity = 1.0f;               // 手柄Y位移 -> 高度变化比例
-    public float minHeight = 0.3f;                 // 允许的最低视角高度(米)
-    public float maxHeight = 2.2f;                 // 允许的最高视角高度(米)
+    /// <summary>
+    /// How sensitive the height change is.  
+    /// Bigger value = faster height change.
+    /// </summary>
+    public float sensitivity = 1.0f;
 
-    Transform _trackingSpace;
-    float _baseOffsetY;                             // 开始时的偏移
-    float _startCtrlY;                              // 开始时手柄世界Y
-    bool  _adjusting;
+    /// <summary>
+    /// The lowest allowed height (in meters).
+    /// </summary>
+    public float minHeight = 0.3f;
+
+    /// <summary>
+    /// The highest allowed height (in meters).
+    /// </summary>
+    public float maxHeight = 2.2f;
+
+    // Internal values
+    Transform _trackingSpace;   // Reference to TrackingSpace inside the camera rig
+    float _baseOffsetY;         // The height offset when adjustment starts
+    float _startCtrlY;          // Controller's starting Y position
+    bool _adjusting;            // Whether the player is currently adjusting height
 
     void Awake()
     {
+        // Automatically find the OVRCameraRig if not set manually
         if (!cameraRig) cameraRig = FindObjectOfType<OVRCameraRig>();
+
+        // Get the TrackingSpace transform from the rig
         _trackingSpace = cameraRig ? cameraRig.trackingSpace : null;
     }
 
@@ -31,29 +68,33 @@ public class BB_ViewHeightAdjuster : MonoBehaviour
     {
         if (!_trackingSpace || !controller) return;
 
-        // 开始调整
+        // When the button is first pressed, start height adjustment
         if (OVRInput.GetDown(holdButton))
         {
-            _adjusting    = true;
-            _baseOffsetY  = _trackingSpace.localPosition.y;  // 记录当前高度偏移
-            _startCtrlY   = controller.position.y;            // 记录手柄起始高度（世界Y）
+            _adjusting   = true;
+            _baseOffsetY = _trackingSpace.localPosition.y; // Current height
+            _startCtrlY  = controller.position.y;           // Controller's start Y
         }
 
-        // 调整中
+        // While holding the button, move view up/down with controller movement
         if (_adjusting && OVRInput.Get(holdButton))
         {
+            // Calculate the Y difference from where the controller started
             float dy = (controller.position.y - _startCtrlY) * sensitivity;
+
+            // Add the change to the base height, but keep it in allowed range
             float targetY = Mathf.Clamp(_baseOffsetY + dy, minHeight, maxHeight);
 
+            // Update the tracking space height
             var lp = _trackingSpace.localPosition;
-            lp.y = targetY;                     // 只改 TrackingSpace 的本地Y
-            _trackingSpace.localPosition = lp;  // 视角实时改变
+            lp.y = targetY;
+            _trackingSpace.localPosition = lp;
         }
 
-        // 结束调整——保持当前高度，不再改变
+        // When the button is released, stop adjusting (keep current height)
         if (_adjusting && OVRInput.GetUp(holdButton))
         {
-            _adjusting = false;                 // 什么都不做，偏移值就固定住了
+            _adjusting = false;
         }
     }
 }
